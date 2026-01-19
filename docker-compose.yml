@@ -1,0 +1,45 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mini-ecom-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mini_ecom
+      MYSQL_USER: mini_ecom
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/database/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - mini-ecom-network
+
+  redis:
+    image: redis:alpine
+    container_name: mini-ecom-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - mini-ecom-network
+
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: mini-ecom-meilisearch
+    environment:
+      MEILI_ENV: development
+      MEILI_MASTER_KEY: masterKey
+    ports:
+      - "7700:7700"
+    volumes:
+      - meilisearch_data:/meili_data
+    networks:
+      - mini-ecom-network
+
+volumes:
+  mysql_data:
+  meilisearch_data:
+
+networks:
+  mini-ecom-network:
+    driver: bridge
